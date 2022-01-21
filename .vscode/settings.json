@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "bin/Release/net5.0/publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/35b24a57-7a38-4b3c-8519-8e3a158182a0/resourceGroups/campus-store/providers/Microsoft.Web/sites/campus-store-api"
+}
