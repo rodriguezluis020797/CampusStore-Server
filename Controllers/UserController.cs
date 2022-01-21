@@ -18,8 +18,8 @@ namespace Server.Controllers
     public class UserController : Controller
     {
         //Get user
-        [HttpGet("[action]/{userId}")]
-        public IActionResult getUser(Int64 userId)
+        [HttpGet("[action]/{userEMail}")]
+        public IActionResult getUser(String userEMail)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace Server.Controllers
 
                 using (GeneralContext gc = new GeneralContext())
                 {
-                    user = gc.Users.Where(x => x.UserId == userId).FirstOrDefault();
+                    user = gc.Users.Where(x => x.EMail.Equals(userEMail)).FirstOrDefault();
                 }
 
                 if (user == null)
