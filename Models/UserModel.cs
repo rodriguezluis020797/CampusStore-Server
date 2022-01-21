@@ -20,6 +20,14 @@ namespace Server.Models
         public String FirstName { get; set; }
         public String? MiddleName { get; set; }
         public String LastName { get; set; }
+
+        public void assign(UserModel user){
+            this.FirstName = user.FirstName;
+            this.MiddleName = user.MiddleName;
+            this.LastName = user.LastName;
+        }
     }
+
+    
 
 }
