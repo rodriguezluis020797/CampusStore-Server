@@ -10,16 +10,19 @@ using Server.Data;
 namespace Server.Controllers
 {
 
-    [Route("user")]
+    [Route("users")]
+    /*
+    Basic CRUD operations
+    //delete not yet implemented
+    */
     public class UserController : Controller
     {
-
+        //Get user
         [HttpGet("[action]/{userId}")]
         public IActionResult getUser(Int64 userId)
         {
             try
             {
-
                 UserModel user;
 
                 using (GeneralContext gc = new GeneralContext())
@@ -33,19 +36,23 @@ namespace Server.Controllers
                 }
 
                 return new ObjectResult(user);
-
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return new StatusCodeResult(500);
             }
-
         }
 
+        //create user
         [HttpPost("[action]")]
-        public IActionResult postUser([FromBody] UserModel user)
+        public IActionResult createUser([FromBody] UserModel user)
         {
+            String errorMessage = user.validateUser();
+            if (errorMessage != null)
+            {
+                return new ObjectResult(errorMessage);
+            }
             try
             {
                 UserModel newUser = new UserModel();
@@ -58,7 +65,42 @@ namespace Server.Controllers
                 }
 
                 return new ObjectResult(newUser);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new StatusCodeResult(500);
+            }
+        }
 
+        //update user
+        [HttpPut("[action]")]
+        public IActionResult updateUser([FromBody] UserModel user)
+        {
+            String errorMessage = user.validateUser();
+            if (errorMessage != null)
+            {
+                return new ObjectResult(errorMessage);
+            }
+            try
+            {
+                UserModel userToUpdate;
+
+                using (GeneralContext gc = new GeneralContext())
+                {
+                    userToUpdate = gc.Users.Where(x => x.UserId == user.UserId).FirstOrDefault();
+
+                    if (userToUpdate == null)
+                    {
+                        return new StatusCodeResult(400);
+                    }
+                    userToUpdate.updateUser(user);
+
+                    gc.Update(userToUpdate);
+                    gc.SaveChanges();
+                }
+
+                return new ObjectResult(userToUpdate);
             }
             catch (Exception e)
             {
@@ -67,6 +109,5 @@ namespace Server.Controllers
             }
         }
     }
-
-
 }
+
