@@ -19,7 +19,7 @@ namespace Server.Controllers
     public class UserController : Controller
     {
         //Get user
-        [HttpGet("[action]")]
+        [HttpPut("[action]")]
         public IActionResult getUser([FromBody] LoginModel loginInfo)
         {
             try
@@ -33,7 +33,7 @@ namespace Server.Controllers
                 }
 
                 if(user == null){
-                    return new StatusCodeResult(400);
+                    return new ObjectResult("Invalid username or password.");
                 }
 
                 //get password hash
@@ -41,7 +41,7 @@ namespace Server.Controllers
                     passwordHash = cc.UserPasswordHashes.Where(x => x.UserPasswordHashId == user.UserId).Select(x => x.Sha256Hash).FirstOrDefault();
                 }
                 if(passwordHash == null){
-                    return new StatusCodeResult(400);
+                    return new ObjectResult("Invalid username or password.");
                 }
 
                 //compare hashes
@@ -49,7 +49,7 @@ namespace Server.Controllers
                     return new ObjectResult(user);
                 }
 
-                return new StatusCodeResult(400);
+                return new ObjectResult("Invalid username or password.");
             }
             catch (Exception e)
             {
