@@ -6,6 +6,7 @@ using System.Linq;
 
 using Server.Models;
 using Server.Data;
+using Server.BOL;
 
 namespace Server.Controllers
 {
@@ -18,24 +19,37 @@ namespace Server.Controllers
     public class UserController : Controller
     {
         //Get user
-        [HttpGet("[action]/{userEMail}")]
-        public IActionResult getUser(String userEMail)
+        [HttpGet("[action]")]
+        public IActionResult getUser([FromBody] LoginModel loginInfo)
         {
             try
             {
                 UserModel user;
-
+                String passwordHash;
+                //Get user id
                 using (GeneralContext gc = new GeneralContext())
                 {
-                    user = gc.Users.Where(x => x.EMail.Equals(userEMail)).FirstOrDefault();
+                    user = gc.Users.Where(x => x.EMail.Equals(loginInfo.ProvidedEmail)).FirstOrDefault();
                 }
 
-                if (user == null)
-                {
+                if(user == null){
                     return new StatusCodeResult(400);
                 }
 
-                return new ObjectResult(user);
+                //get password hash
+                using (CredentialContext cc = new CredentialContext()){
+                    passwordHash = cc.UserPasswordHashes.Where(x => x.UserPasswordHashId == user.UserId).Select(x => x.Sha256Hash).FirstOrDefault();
+                }
+                if(passwordHash == null){
+                    return new StatusCodeResult(400);
+                }
+
+                //compare hashes
+                if(passwordHash.Equals(CryptographyBOL.getSha256Hash(loginInfo.ProvidedPassword))){
+                    return new ObjectResult(user);
+                }
+
+                return new StatusCodeResult(400);
             }
             catch (Exception e)
             {
