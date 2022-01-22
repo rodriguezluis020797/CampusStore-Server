@@ -32,20 +32,26 @@ namespace Server.Controllers
                     user = gc.Users.Where(x => x.EMail.Equals(loginInfo.ProvidedEmail)).FirstOrDefault();
                 }
 
-                if(user == null){
+                if (user == null)
+                {
                     return new ObjectResult("Invalid username or password.");
                 }
 
                 //get password hash
-                using (CredentialContext cc = new CredentialContext()){
+                using (CredentialContext cc = new CredentialContext())
+                {
                     passwordHash = cc.UserPasswordHashes.Where(x => x.UserPasswordHashId == user.UserId).Select(x => x.Sha256Hash).FirstOrDefault();
                 }
-                if(passwordHash == null){
+                if (passwordHash == null)
+                {
                     return new ObjectResult("Invalid username or password.");
                 }
 
                 //compare hashes
-                if(passwordHash.Equals(CryptographyBOL.getSha256Hash(loginInfo.ProvidedPassword))){
+                if (passwordHash.Equals(CryptographyBOL.getSha256Hash(loginInfo.ProvidedPassword)))
+                {
+                    
+
                     return new ObjectResult(user);
                 }
 
@@ -78,7 +84,15 @@ namespace Server.Controllers
                     gc.SaveChanges();
                 }
 
-                return new ObjectResult(newUser);
+                NewUserModel returnNewUser = new NewUserModel();
+                returnNewUser.user = newUser;
+                returnNewUser.tempPassword = UserPasswordHashIdController.setTempPassword(returnNewUser.user.UserId);
+
+                if(returnNewUser.tempPassword == null){
+                    return new ObjectResult("Error: Profile created but temporary password not set. Please contact customer service.");
+                }
+
+                return new ObjectResult(returnNewUser);
             }
             catch (Exception e)
             {

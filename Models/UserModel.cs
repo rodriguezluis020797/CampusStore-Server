@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+using Server.Data;
+
 using Server.BOL;
 
 
@@ -23,22 +25,30 @@ namespace Server.Models
         public String? MiddleName { get; set; }
         public String LastName { get; set; }
         public String EMail { get; set; }
+        public bool HasLoggedIn { get; set; }
 
         public String validateUser()
         {
-            if (String.IsNullOrWhiteSpace(FirstName))
+            if (String.IsNullOrWhiteSpace(this.FirstName))
             {
                 return "Valid first name required.";
             }
-            else if (String.IsNullOrWhiteSpace(LastName))
+            else if (String.IsNullOrWhiteSpace(this.LastName))
             {
                 return "Valid last name required.";
             }
-            else if (ContactInfoBOL.IsValidEmail(EMail) == false)
+            else if (ContactInfoBOL.IsValidEmail(this.EMail) == false)
             {
                 return "Valid E-Mail format required.";
             }
-
+            String str;
+            using(GeneralContext gc = new GeneralContext()){
+                str = gc.Users.Where(x => x.EMail == this.EMail).Select(x => x.EMail).FirstOrDefault();
+            }
+            if(str != null){
+                return "Profile with email '" + str + "' already exists.";
+            }
+            
             return null;
         }
 
@@ -48,6 +58,7 @@ namespace Server.Models
             this.MiddleName = user.MiddleName;
             this.LastName = user.LastName;
             this.EMail = user.EMail;
+            this.HasLoggedIn = user.HasLoggedIn;
         }
         public void createUser(UserModel user)
         {
