@@ -88,11 +88,10 @@ namespace Server.Controllers
                 returnNewUser.user = newUser;
                 returnNewUser.tempPassword = UserPasswordHashIdController.setTempPassword(returnNewUser.user.UserId);
 
-                if(returnNewUser.tempPassword == null){
-                    return new ObjectResult("Error: Profile created but temporary password not set. Please contact customer service.");
-                }
+                EmailBOL emailBOL = new EmailBOL();
+                emailBOL.newUserEmail(returnNewUser.tempPassword, returnNewUser.user.EMail, returnNewUser.user.FirstName);
 
-                return new ObjectResult(returnNewUser);
+                return new ObjectResult(newUser);
             }
             catch (Exception e)
             {
