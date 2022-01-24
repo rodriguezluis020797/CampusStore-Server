@@ -89,7 +89,7 @@ namespace Server.Controllers
                 returnNewUser.tempPassword = UserPasswordHashIdController.setTempPassword(returnNewUser.user.UserId);
 
                 EmailBOL emailBOL = new EmailBOL();
-                emailBOL.newUserEmail(returnNewUser.tempPassword, returnNewUser.user.EMail, returnNewUser.user.FirstName);
+                emailBOL.setTempPassword(returnNewUser.tempPassword, returnNewUser.user.EMail, returnNewUser.user.FirstName);
 
                 return new ObjectResult(newUser);
             }

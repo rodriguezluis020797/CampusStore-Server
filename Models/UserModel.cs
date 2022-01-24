@@ -29,7 +29,24 @@ namespace Server.Models
 
         public String validateUser()
         {
-            if (String.IsNullOrWhiteSpace(this.FirstName))
+            if (ContactInfoBOL.IsValidEmail(this.EMail) == false)
+            {
+                return "Valid E-Mail format required.";
+            }
+            else if (this.EMail.Substring(this.EMail.Length - 4).Equals(".edu") == false)
+            {
+                return "Only accepting '.edu' E-Mail domains.";
+            }
+            String str;
+            using (GeneralContext gc = new GeneralContext())
+            {
+                str = gc.Users.Where(x => x.EMail == this.EMail).Select(x => x.EMail).FirstOrDefault();
+            }
+            if (str != null)
+            {
+                return "Profile with email '" + str + "' already exists.";
+            }
+            else if (String.IsNullOrWhiteSpace(this.FirstName))
             {
                 return "Valid first name required.";
             }
@@ -37,18 +54,9 @@ namespace Server.Models
             {
                 return "Valid last name required.";
             }
-            else if (ContactInfoBOL.IsValidEmail(this.EMail) == false)
-            {
-                return "Valid E-Mail format required.";
-            }
-            String str;
-            using(GeneralContext gc = new GeneralContext()){
-                str = gc.Users.Where(x => x.EMail == this.EMail).Select(x => x.EMail).FirstOrDefault();
-            }
-            if(str != null){
-                return "Profile with email '" + str + "' already exists.";
-            }
-            
+
+
+
             return null;
         }
 

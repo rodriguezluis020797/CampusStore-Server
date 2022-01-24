@@ -13,6 +13,8 @@ namespace Server.Controllers
     [Route("userpasswordhashes")]
     public class UserPasswordHashIdController : Controller
     {
+
+        private static readonly int tempPasswordLength = 10;
         //set
         [HttpPost("[action]")]
         public IActionResult setPassword([FromBody] PasswordChangeModel passwordChangeModel)
@@ -103,6 +105,45 @@ namespace Server.Controllers
             }
         }
 
+        [HttpGet("[action]/{email}")]
+        public IActionResult resetPassword(String eMail){
+            try{
+                UserPasswordHash passwordHash;
+                Int64 userId;
+                String tempPassword;
+
+                using (GeneralContext gc = new GeneralContext())
+                {
+                    userId = gc.Users.Where(x => x.EMail == eMail).Select(x => x.UserId).FirstOrDefault();
+                }
+
+                if(userId <= 0){
+                    return new ObjectResult(false);
+                }
+
+                //Length 7
+                
+                using(CredentialContext cc = new CredentialContext()){
+
+                    passwordHash = cc.UserPasswordHashes.Where(x => x.UserPasswordHashId == userId).FirstOrDefault();
+                    CryptographyBOL cryp = new CryptographyBOL();
+                    tempPassword = cryp.RandomString(UserPasswordHashIdController.tempPasswordLength);
+                    passwordHash.Sha256Hash = CryptographyBOL.getSha256Hash(tempPassword);
+
+                    cc.UserPasswordHashes.Update(passwordHash);
+                    cc.SaveChanges();
+                }
+
+                EmailBOL emailBOL = new EmailBOL();
+                emailBOL.setTempPassword(tempPassword, eMail, "");
+
+                return new ObjectResult(true);
+            }catch (Exception e){
+                Console.WriteLine(e);
+                return new StatusCodeResult(500);
+            }
+        }
+
         /*
         Non-Routed Methods
         */
@@ -113,7 +154,7 @@ namespace Server.Controllers
                 UserPasswordHash newUserPasswordHash = new UserPasswordHash();
                 CryptographyBOL cryp = new CryptographyBOL();
                 //Length 7
-                String str = cryp.RandomString(7);
+                String str = cryp.RandomString(UserPasswordHashIdController.tempPasswordLength);
 
                 newUserPasswordHash.UserPasswordHashId = userId;
                 newUserPasswordHash.Sha256Hash = CryptographyBOL.getSha256Hash(str);

@@ -14,7 +14,7 @@ namespace Server.BOL
         private readonly String password = "nubJosqoxgyg9qukpo";
         private readonly String fromEMail = "campus.store.mail@gmail.com";
         private readonly String fromName = "Campus Store";
-        public void newUserEmail(String tempPassword, String email, String Name)
+        public void setTempPassword(String tempPassword, String email, String Name)
         {
             var mailMessage = new MimeMessage();
             mailMessage.From.Add(new MailboxAddress(fromName, fromEMail));
