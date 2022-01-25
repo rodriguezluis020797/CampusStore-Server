@@ -33,10 +33,10 @@ namespace Server.Models
             {
                 return "Valid E-Mail format required.";
             }
-            else if (this.EMail.Substring(this.EMail.Length - 4).Equals(".edu") == false)
-            {
-                return "Only accepting '.edu' E-Mail domains.";
-            }
+            // else if (this.EMail.Substring(this.EMail.Length - 4).Equals(".edu") == false)
+            // {
+            //     return "Only accepting '.edu' E-Mail domains.";
+            // }
             String str;
             using (GeneralContext gc = new GeneralContext())
             {
