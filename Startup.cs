@@ -32,7 +32,7 @@ namespace Server
                               builder =>
                               {
                                   builder.WithOrigins("http://localhost:4200",
-                                  "https://campus-store-client.azurewebsites.net/")
+                                  "https://campus-store-client.azurewebsites.net")
                                   .AllowAnyHeader().AllowAnyMethod();
                               });
         });
